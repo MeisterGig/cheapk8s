@@ -11,11 +11,11 @@
 # -----------------------------------------------------
 box = "ubuntu/focal64"  # CKE says Ubuntu 20.04, so who am I to argue?
 cpus = "2"
-memory = "2048"
+memory = "7500"
 
-cp_ip_addr = "10.0.0.175"
-wrk1_ip_addr = "10.0.0.176"
-wrk2_ip_addr = "10.0.0.177"
+master_ip_addr = "10.3.0.175"
+worker1_ip_addr = "10.3.0.176"
+worker2_ip_addr = "10.3.0.177"
 
 # chapter 16 - extra nodes - uncomment when needed (chapter 16)
 # lb_ip_addr = "10.0.0.180"
@@ -41,17 +41,17 @@ Vagrant.configure("2") do |config|
   end
 
   # controlplane
-  config.vm.define "cp" do |server|
+  config.vm.define "master" do |server|
     server.vm.box = box
-    server.vm.hostname = "cp.example.com"
-    server.vm.post_up_message = "cp is up"
-    server.vm.network :private_network, ip: cp_ip_addr
+    server.vm.hostname = "master"
+    server.vm.post_up_message = "master is up"
+    server.vm.network :private_network, ip: master_ip_addr
 
     # kubernetes api server port
     server.vm.network "forwarded_port", guest: 6443, host: 6443
 
     server.vm.provision "shell", inline: <<-SHELL
-      echo "this is my kubernetes controlplane"
+      echo "this is my kubernetes master"
     SHELL
   end
 
@@ -100,22 +100,22 @@ Vagrant.configure("2") do |config|
   #end
 
   # workers
-  config.vm.define "wrk1" do |server|
+  config.vm.define "worker1" do |server|
     server.vm.box = box
-    server.vm.hostname = "wrk1.example.com"
-    server.vm.post_up_message = "wrk1 is up"
-    server.vm.network :private_network, ip: wrk1_ip_addr
+    server.vm.hostname = "worker1"
+    server.vm.post_up_message = "worker1 is up"
+    server.vm.network :private_network, ip: worker1_ip_addr
 
     server.vm.provision "shell", inline: <<-SHELL
       echo "this is my kubernetes worker (number 1)"
     SHELL
   end
 
-  config.vm.define "wrk2" do |server|
+  config.vm.define "worker2" do |server|
     server.vm.box = box
-    server.vm.hostname = "wrk2.example.com"
-    server.vm.post_up_message = "wrk2 is up"
-    server.vm.network :private_network, ip: wrk2_ip_addr
+    server.vm.hostname = "worker2"
+    server.vm.post_up_message = "worker2 is up"
+    server.vm.network :private_network, ip: worker2_ip_addr
 
     server.vm.provision "shell", inline: <<-SHELL
       echo "this is my kubernetes worker (number 2)"
